@@ -1,0 +1,1895 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="description" content="MessTrack - Offline-first mess attendance tracker for hostel students">
+    <meta name="theme-color" content="#667eea">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>MessTrack - Mess Attendance Tracker</title>
+
+    <!-- PWA Meta Tags -->
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Font Awesome for Icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+    <!-- Modern Glassmorphism UI - Full Transparent Design -->
+    <link rel="stylesheet" href="glassmorphism-ui.css">
+
+    <!-- Enhanced Button Design System -->
+    <link rel="stylesheet" href="enhanced-button-styles.css">
+
+    <!-- Reduced Animations for Better Performance -->
+    <link rel="stylesheet" href="reduced-animations.css">
+
+    <!-- Performance Optimizations -->
+    <link rel="stylesheet" href="optimization-styles.css">
+
+    <!-- jsPDF for PDF export -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+    <!-- QR Code Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode/1.5.3/qrcode.min.js"></script>
+
+    <style>
+        :root {
+            --glass-bg-light: rgba(255, 255, 255, 0.25);
+            --glass-bg-dark: rgba(0, 0, 0, 0.25);
+            --glass-border: rgba(255, 255, 255, 0.18);
+            --backdrop-blur: 16px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            min-height: 100vh;
+            transition: all 0.3s ease;
+            overscroll-behavior: none;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+
+        input,
+        textarea {
+            -webkit-user-select: text;
+            user-select: text;
+        }
+
+        /* Light Theme */
+        body.light-theme {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #1a1a1a;
+        }
+
+        /* Dark Theme */
+        body.dark-theme {
+            background: linear-gradient(135deg, #1a1a2e 0%, #0f0e1e 100%);
+            color: #ffffff;
+        }
+
+        /* Glass Effect */
+        .glass {
+            background: var(--glass-bg-light);
+            backdrop-filter: blur(var(--backdrop-blur));
+            -webkit-backdrop-filter: blur(var(--backdrop-blur));
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+        }
+
+        .dark-theme .glass {
+            background: var(--glass-bg-dark);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+
+        /* Button Styles */
+        .btn-glass {
+            padding: 12px 24px;
+            border-radius: 12px;
+            border: 1px solid var(--glass-border);
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+        }
+
+        .btn-glass:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: translateY(-2px) scale(1.02);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+        }
+
+        .btn-glass:active {
+            transform: translateY(0) scale(0.98);
+            transition: all 0.1s ease;
+        }
+
+        /* Bottom Navigation Styles */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-top: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.1);
+            padding: 8px 0 calc(8px + env(safe-area-inset-bottom));
+            z-index: 1000;
+        }
+
+        .dark-theme .bottom-nav {
+            background: rgba(0, 0, 0, 0.95);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 8px 12px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border-radius: 12px;
+            position: relative;
+            min-width: 60px;
+        }
+
+        .nav-item i {
+            font-size: 22px;
+            margin-bottom: 4px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .nav-item span {
+            font-size: 11px;
+            font-weight: 500;
+            opacity: 0.7;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .nav-item:active {
+            transform: scale(0.9);
+        }
+
+        .nav-item:hover i {
+            transform: translateY(-2px) scale(1.1);
+        }
+
+        .nav-item.active {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.2), rgba(118, 75, 162, 0.2));
+        }
+
+        /* Ripple effect */
+        .nav-item::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: rgba(102, 126, 234, 0.3);
+            border-radius: 50%;
+            transform: scale(0);
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .nav-item:active::after {
+            animation: ripple 0.6s ease-out;
+        }
+
+        @keyframes ripple {
+            to {
+                transform: scale(2.5);
+                opacity: 0;
+            }
+        }
+
+        .nav-item.active i {
+            color: #667eea;
+            transform: scale(1.15);
+        }
+
+        .nav-item.active span {
+            opacity: 1;
+            font-weight: 600;
+            color: #667eea;
+        }
+
+        .dark-theme .nav-item.active i,
+        .dark-theme .nav-item.active span {
+            color: #818cf8;
+        }
+
+        /* Active indicator dot */
+        .nav-item.active::before {
+            content: '';
+            position: absolute;
+            top: 2px;
+            width: 4px;
+            height: 4px;
+            background: #667eea;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+
+            50% {
+                opacity: 0.6;
+                transform: scale(1.5);
+            }
+        }
+
+        /* Content padding to avoid bottom nav overlap */
+        .main-content {
+            padding-bottom: 80px;
+        }
+
+        /* Page Transitions */
+        .page {
+            animation: slideInRight 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .page.slide-left {
+            animation: slideInLeft 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes slideInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        /* Attendance Button Animations */
+        .attendance-btn {
+            transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        .attendance-btn:hover {
+            transform: translateY(-4px) scale(1.02);
+            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.2);
+        }
+
+        .attendance-btn.marked {
+            background: linear-gradient(135deg, #22c55e, #16a34a);
+            transform: scale(1.05);
+            box-shadow: 0 8px 20px rgba(34, 197, 94, 0.3);
+        }
+
+        .attendance-btn.marked i {
+            animation: checkmark 0.5s ease;
+        }
+
+        @keyframes checkmark {
+            0% {
+                transform: scale(0) rotate(-45deg);
+            }
+
+            50% {
+                transform: scale(1.2) rotate(10deg);
+            }
+
+            100% {
+                transform: scale(1) rotate(0deg);
+            }
+        }
+
+        /* Calendar Grid */
+        .calendar-day {
+            aspect-ratio: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+        }
+
+        .calendar-day:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: scale(1.08);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Loading Animation */
+        .loader {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top-color: #fff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Toast Notification */
+        .toast {
+            position: fixed;
+            bottom: 90px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            padding: 16px 24px;
+            border-radius: 16px;
+            background: linear-gradient(135deg, rgba(0, 0, 0, 0.9), rgba(30, 30, 30, 0.9));
+            color: white;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            opacity: 0;
+            transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            z-index: 1001;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            min-width: 300px;
+            max-width: 90vw;
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+
+        .toast button {
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        @media (max-width: 640px) {
+            .toast {
+                bottom: 80px;
+                min-width: 280px;
+                padding: 12px 16px;
+            }
+        }
+
+        /* Smooth scrolling */
+        * {
+            scroll-behavior: smooth;
+        }
+
+        /* Input styling */
+        input[type="date"],
+        input[type="time"],
+        select,
+        textarea {
+            transition: all 0.3s ease;
+        }
+
+        input[type="date"]:focus,
+        input[type="time"]:focus,
+        select:focus,
+        textarea:focus {
+            outline: none;
+            border-color: rgba(59, 130, 246, 0.5);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        /* Splash Screen */
+        #splashScreen {
+            position: fixed;
+            inset: 0;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            transition: opacity 0.5s ease;
+        }
+
+        #splashScreen.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .splash-logo {
+            font-size: 80px;
+            animation: bounceIn 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        .splash-text {
+            font-size: 32px;
+            font-weight: bold;
+            margin-top: 20px;
+            animation: fadeInUp 0.8s ease 0.3s both;
+        }
+
+        .splash-tagline {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-top: 8px;
+            animation: fadeInUp 0.8s ease 0.5s both;
+        }
+
+        .splash-loader {
+            margin-top: 40px;
+            animation: fadeInUp 0.8s ease 0.7s both;
+        }
+
+        @keyframes bounceIn {
+            0% {
+                transform: scale(0);
+                opacity: 0;
+            }
+
+            50% {
+                transform: scale(1.1);
+            }
+
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        /* Offline Banner */
+        #offlineBanner {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(135deg, #f59e0b, #ea580c);
+            color: white;
+            padding: 12px 20px;
+            text-align: center;
+            font-weight: 600;
+            transform: translateY(-100%);
+            transition: transform 0.3s ease;
+            z-index: 1001;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        #offlineBanner.show {
+            transform: translateY(0);
+        }
+
+        /* Update Prompt */
+        #updatePrompt {
+            position: fixed;
+            bottom: 90px;
+            left: 20px;
+            right: 20px;
+            max-width: 400px;
+            margin: 0 auto;
+            background: rgba(34, 197, 94, 0.95);
+            backdrop-filter: blur(20px);
+            color: white;
+            padding: 16px 20px;
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            transform: translateY(200%);
+            transition: transform 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            z-index: 1002;
+        }
+
+        #updatePrompt.show {
+            transform: translateY(0);
+        }
+
+        /* Pull to Refresh */
+        .pull-to-refresh {
+            position: absolute;
+            top: -80px;
+            left: 0;
+            right: 0;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        .pull-to-refresh.pulling {
+            transform: translateY(80px);
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .pull-spinner {
+            width: 30px;
+            height: 30px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        /* Gesture Hints */
+        .gesture-hint {
+            position: fixed;
+            bottom: 120px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 24px;
+            font-size: 14px;
+            z-index: 1003;
+            animation: slideUpFade 0.5s ease, pulse 2s ease 0.5s infinite;
+            pointer-events: none;
+        }
+
+        @keyframes slideUpFade {
+            from {
+                opacity: 0;
+                transform: translate(-50%, 20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translate(-50%, 0);
+            }
+        }
+
+        /* Badge Notifications */
+        .nav-badge {
+            position: absolute;
+            top: 4px;
+            right: 8px;
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: white;
+            font-size: 10px;
+            font-weight: bold;
+            padding: 2px 6px;
+            border-radius: 10px;
+            min-width: 18px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(239, 68, 68, 0.4);
+            animation: badgePop 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        @keyframes badgePop {
+            0% {
+                transform: scale(0);
+            }
+
+            50% {
+                transform: scale(1.2);
+            }
+
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        /* Long Press Menu */
+        .long-press-menu {
+            position: fixed;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 16px;
+            padding: 8px;
+            box-shadow: 0 12px 48px rgba(0, 0, 0, 0.3);
+            z-index: 1004;
+            transform: scale(0);
+            transition: transform 0.2s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        .dark-theme .long-press-menu {
+            background: rgba(30, 30, 30, 0.95);
+        }
+
+        .long-press-menu.show {
+            transform: scale(1);
+        }
+
+        .long-press-item {
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .long-press-item:hover {
+            background: rgba(102, 126, 234, 0.2);
+        }
+
+        .long-press-item i {
+            margin-right: 12px;
+            width: 20px;
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .glass {
+                border-radius: 12px;
+            }
+
+            .nav-item {
+                padding: 10px 16px;
+                font-size: 14px;
+            }
+
+            .btn-glass {
+                padding: 10px 20px;
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+
+<body class="light-theme">
+    <!-- Splash Screen -->
+    <div id="splashScreen">
+        <div class="splash-logo">🍽️</div>
+        <div class="splash-text">MessTrack</div>
+        <div class="splash-tagline">Your Mess Attendance Manager</div>
+        <div class="splash-loader loader"></div>
+    </div>
+
+    <!-- Offline Banner -->
+    <div id="offlineBanner">
+        <i class="fas fa-wifi-slash mr-2"></i>
+        You're offline. Some features may be limited.
+    </div>
+
+    <!-- Update Prompt -->
+    <div id="updatePrompt">
+        <div class="flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <i class="fas fa-download text-2xl"></i>
+                <div>
+                    <div class="font-bold">Update Available</div>
+                    <div class="text-sm opacity-90">New version with improvements!</div>
+                </div>
+            </div>
+            <button id="updateNow"
+                class="bg-white text-green-600 px-4 py-2 rounded-lg font-bold text-sm hover:bg-opacity-90 transition">
+                Update
+            </button>
+        </div>
+        <button id="dismissUpdate" class="absolute top-2 right-2 text-white opacity-60 hover:opacity-100">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+
+    <!-- Install Teaser Banner -->
+    <div id="installTeaser"
+        class="fixed bottom-20 left-4 right-4 max-w-md mx-auto glass p-4 rounded-2xl shadow-2xl transform translate-y-40 transition-all duration-500 z-50 hidden">
+        <button id="dismissInstallTeaser" class="absolute top-2 right-2 opacity-60 hover:opacity-100">
+            <i class="fas fa-times"></i>
+        </button>
+        <div class="flex items-center gap-3">
+            <div class="w-12 h-12 glass rounded-full flex items-center justify-center text-2xl">
+                🍽️
+            </div>
+            <div class="flex-1">
+                <div class="font-bold text-sm">Install MessTrack</div>
+                <div class="text-xs opacity-80">Access faster, work offline!</div>
+            </div>
+            <button id="installTeaserBtn" class="btn-glass px-4 py-2 text-sm font-bold">
+                Install
+            </button>
+        </div>
+    </div>
+
+    <!-- Gesture Hints -->
+    <div id="gestureHints" class="hidden"></div>
+
+    <!-- Long Press Menu -->
+    <div id="longPressMenu" class="long-press-menu"></div>
+
+    <!-- Main Container -->
+    <div class="min-h-screen p-4 lg:p-8">
+        <div class="max-w-6xl mx-auto">
+            <!-- Header -->
+            <header class="glass p-6 mb-6">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <h1 class="text-3xl font-bold mb-1">
+                            <i class="fas fa-utensils mr-2"></i>MessTrack
+                        </h1>
+                        <p class="opacity-80 text-sm">Your Mess Attendance Manager</p>
+                    </div>
+                    <div class="flex gap-2">
+                        <button id="quickPerfToggle" class="btn-glass" title="Performance Mode">
+                            <i class="fas fa-tachometer-alt" id="perfIcon"></i>
+                            <span id="perfLabel" class="text-xs ml-1 hidden md:inline">Auto</span>
+                        </button>
+                        <button id="themeToggle" class="btn-glass" title="Toggle Theme">
+                            <i class="fas fa-moon" id="themeIcon"></i>
+                        </button>
+                    </div>
+                </div>
+            </header>
+
+
+            <!-- Main Content Area -->
+            <main id="mainContent" class="main-content" style="position: relative;">
+                <!-- Pull to Refresh Indicator -->
+                <div class="pull-to-refresh">
+                    <div class="pull-spinner"></div>
+                </div>
+
+                <!-- Dashboard Page -->
+                <div id="dashboard" class="page">
+                    <!-- Today's Date Card -->
+                    <div class="glass p-6 mb-6">
+                        <div class="text-center">
+                            <p class="text-lg opacity-80 mb-2">Today's Date</p>
+                            <h2 class="text-4xl font-bold" id="currentDate"></h2>
+                            <p class="text-sm opacity-60 mt-2" id="currentDay"></p>
+                        </div>
+                    </div>
+
+                    <!-- Attendance Buttons -->
+                    <div class="grid md:grid-cols-2 gap-6 mb-6">
+                        <!-- Lunch Button -->
+                        <button id="lunchBtn" class="glass attendance-btn p-8 text-center">
+                            <i class="fas fa-sun text-5xl mb-4 text-yellow-400"></i>
+                            <h3 class="text-2xl font-bold mb-2">Lunch</h3>
+                            <p class="opacity-80">Tap to mark attendance</p>
+                            <div class="mt-4" id="lunchStatus"></div>
+                        </button>
+
+                        <!-- Dinner Button -->
+                        <button id="dinnerBtn" class="glass attendance-btn p-8 text-center">
+                            <i class="fas fa-moon text-5xl mb-4 text-blue-400"></i>
+                            <h3 class="text-2xl font-bold mb-2">Dinner</h3>
+                            <p class="opacity-80">Tap to mark attendance</p>
+                            <div class="mt-4" id="dinnerStatus"></div>
+                        </button>
+                    </div>
+
+                    <!-- Daily Status -->
+                    <div class="glass p-6">
+                        <h3 class="text-xl font-bold mb-4">Today's Status</h3>
+                        <div id="dailyStatus" class="grid grid-cols-2 gap-4">
+                            <!-- Status will be populated by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Weekly View Page -->
+                <div id="weekly" class="page hidden">
+                    <div class="glass p-6">
+                        <div class="flex flex-wrap justify-between items-center gap-4 mb-6">
+                            <h2 class="text-2xl font-bold">Attendance View</h2>
+                            <div class="flex flex-wrap gap-2">
+                                <button id="bulkEditToggle" class="btn-glass">
+                                    <i class="fas fa-edit mr-2"></i>Bulk Edit
+                                </button>
+                                <button id="dateRangeToggle" class="btn-glass">
+                                    <i class="fas fa-calendar-alt mr-2"></i>Date Range
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Date Range Picker -->
+                        <div id="dateRangePanel" class="hidden mb-6 glass p-4">
+                            <h3 class="text-lg font-bold mb-4">Select Date Range</h3>
+                            <div class="grid md:grid-cols-2 gap-4 mb-4">
+                                <div>
+                                    <label class="block text-sm mb-2">Start Date</label>
+                                    <input type="date" id="startDate"
+                                        class="glass px-4 py-2 rounded-lg bg-transparent w-full">
+                                </div>
+                                <div>
+                                    <label class="block text-sm mb-2">End Date</label>
+                                    <input type="date" id="endDate"
+                                        class="glass px-4 py-2 rounded-lg bg-transparent w-full">
+                                </div>
+                            </div>
+                            <div class="flex gap-2">
+                                <button id="applyDateRange" class="btn-glass">Apply Range</button>
+                                <button id="resetToWeekly" class="btn-glass">Reset to Last 7 Days</button>
+                                <button id="closeDateRange" class="btn-glass">Close</button>
+                            </div>
+                        </div>
+
+                        <!-- Weekly Grid -->
+                        <div id="weeklyGrid" class="space-y-4">
+                            <!-- Weekly attendance will be populated by JavaScript -->
+                        </div>
+
+                        <!-- Bulk Edit Panel -->
+                        <div id="bulkEditPanel" class="hidden mt-6 glass p-4">
+                            <h3 class="text-lg font-bold mb-4">Bulk Edit Mode</h3>
+                            <div class="flex flex-wrap gap-4 mb-4">
+                                <button id="bulkSelectAll" class="btn-glass">Select All</button>
+                                <button id="bulkSelectNone" class="btn-glass">Select None</button>
+                                <button id="bulkMarkLunch" class="btn-glass bg-yellow-500 bg-opacity-20">Mark
+                                    Lunch</button>
+                                <button id="bulkMarkDinner" class="btn-glass bg-blue-500 bg-opacity-20">Mark
+                                    Dinner</button>
+                                <button id="bulkMarkBoth" class="btn-glass bg-green-500 bg-opacity-20">Mark
+                                    Both</button>
+                                <button id="bulkClear" class="btn-glass bg-red-500 bg-opacity-20">Clear All</button>
+                            </div>
+                            <div class="flex flex-wrap gap-2">
+                                <button id="exportSelectedCSV" class="btn-glass bg-blue-500 bg-opacity-20">
+                                    <i class="fas fa-file-csv mr-2"></i>Export Selected (CSV)
+                                </button>
+                                <button id="exportSelectedPDF" class="btn-glass bg-red-500 bg-opacity-20">
+                                    <i class="fas fa-file-pdf mr-2"></i>Export Selected (PDF)
+                                </button>
+                                <button id="bulkEditCancel" class="btn-glass">Cancel</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- History Page -->
+                <div id="history" class="page hidden">
+                    <div class="glass p-6">
+                        <!-- Month Navigation -->
+                        <div class="flex justify-between items-center mb-6">
+                            <button id="prevMonth" class="btn-glass">
+                                <i class="fas fa-chevron-left"></i>
+                            </button>
+                            <h2 class="text-2xl font-bold" id="currentMonth"></h2>
+                            <button id="nextMonth" class="btn-glass">
+                                <i class="fas fa-chevron-right"></i>
+                            </button>
+                        </div>
+
+                        <!-- Calendar Grid -->
+                        <div class="grid grid-cols-7 gap-2 mb-4">
+                            <!-- Day Headers -->
+                            <div class="text-center font-bold opacity-60 text-sm">Sun</div>
+                            <div class="text-center font-bold opacity-60 text-sm">Mon</div>
+                            <div class="text-center font-bold opacity-60 text-sm">Tue</div>
+                            <div class="text-center font-bold opacity-60 text-sm">Wed</div>
+                            <div class="text-center font-bold opacity-60 text-sm">Thu</div>
+                            <div class="text-center font-bold opacity-60 text-sm">Fri</div>
+                            <div class="text-center font-bold opacity-60 text-sm">Sat</div>
+                        </div>
+                        <div id="calendarGrid" class="grid grid-cols-7 gap-2">
+                            <!-- Calendar days will be populated by JavaScript -->
+                        </div>
+
+                        <!-- Legend -->
+                        <div class="flex justify-center gap-6 mt-6">
+                            <div class="flex items-center gap-2">
+                                <i class="fas fa-sun text-yellow-400"></i>
+                                <span class="text-sm">Lunch</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <i class="fas fa-moon text-blue-400"></i>
+                                <span class="text-sm">Dinner</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <i class="fas fa-check-circle text-green-400"></i>
+                                <span class="text-sm">Both</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Summary Page -->
+                <div id="summary" class="page hidden">
+                    <!-- Month Navigation -->
+                    <div class="glass p-4 mb-6 flex items-center justify-between">
+                        <button id="prevMonthStats" class="btn-glass">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        <h2 class="text-2xl font-bold" id="statsMonthDisplay">Loading...</h2>
+                        <button id="nextMonthStats" class="btn-glass">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+
+                    <!-- Key Metrics Cards -->
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                        <div class="glass p-4 text-center">
+                            <i class="fas fa-sun text-3xl text-yellow-400 mb-2"></i>
+                            <p class="text-2xl font-bold" id="statsLunchCount">0</p>
+                            <p class="text-xs opacity-60">Lunch</p>
+                        </div>
+                        <div class="glass p-4 text-center">
+                            <i class="fas fa-moon text-3xl text-blue-400 mb-2"></i>
+                            <p class="text-2xl font-bold" id="statsDinnerCount">0</p>
+                            <p class="text-xs opacity-60">Dinner</p>
+                        </div>
+                        <div class="glass p-4 text-center">
+                            <i class="fas fa-percentage text-3xl text-green-400 mb-2"></i>
+                            <p class="text-2xl font-bold" id="statsAttendancePercentage">0%</p>
+                            <p class="text-xs opacity-60">Attendance</p>
+                        </div>
+                        <div class="glass p-4 text-center">
+                            <i class="fas fa-utensils text-3xl text-purple-400 mb-2"></i>
+                            <p class="text-2xl font-bold" id="statsTotalMeals">0</p>
+                            <p class="text-xs opacity-60">Total Meals</p>
+                        </div>
+                    </div>
+
+                    <!-- Additional Metrics -->
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                        <div class="glass p-3 text-center">
+                            <p class="text-lg font-bold" id="statsBothMeals">0</p>
+                            <p class="text-xs opacity-60">Both Meals</p>
+                        </div>
+                        <div class="glass p-3 text-center">
+                            <p class="text-lg font-bold" id="statsCurrentStreak">0 days</p>
+                            <p class="text-xs opacity-60">Current Streak</p>
+                        </div>
+                        <div class="glass p-3 text-center">
+                            <p class="text-lg font-bold" id="statsLongestStreak">0 days</p>
+                            <p class="text-xs opacity-60">Longest Streak</p>
+                        </div>
+                        <div class="glass p-3 text-center">
+                            <p class="text-lg font-bold" id="statsSkippedDays">0</p>
+                            <p class="text-xs opacity-60">Skipped Days</p>
+                        </div>
+                    </div>
+
+                    <!-- Charts Section -->
+                    <div class="grid md:grid-cols-2 gap-6 mb-6">
+                        <!-- Meal Distribution -->
+                        <div class="glass p-6">
+                            <h3 class="text-lg font-bold mb-4">📊 Meal Distribution</h3>
+                            <canvas id="mealDistributionChart" width="300" height="300"></canvas>
+                        </div>
+
+                        <!-- Weekly Trend -->
+                        <div class="glass p-6">
+                            <h3 class="text-lg font-bold mb-4">📈 Weekly Trend</h3>
+                            <canvas id="weeklyTrendChart" width="300" height="300"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Weekday Pattern -->
+                    <div class="glass p-6 mb-6">
+                        <h3 class="text-lg font-bold mb-4">📅 Weekday Pattern</h3>
+                        <canvas id="weekdayPatternChart" width="600" height="300"></canvas>
+                    </div>
+
+                    <!-- Daily Heatmap -->
+                    <div class="glass p-6 mb-6">
+                        <h3 class="text-lg font-bold mb-4">🔥 Daily Heatmap</h3>
+                        <div id="dailyHeatmap" class="flex flex-wrap gap-1"></div>
+                        <div class="flex items-center gap-4 mt-4 text-xs">
+                            <div class="flex items-center gap-2">
+                                <div class="w-4 h-4 rounded" style="background: rgba(239, 68, 68, 0.2);"></div>
+                                <span>0 meals</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <div class="w-4 h-4 rounded" style="background: rgba(251, 191, 36, 0.4);"></div>
+                                <span>1 meal</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <div class="w-4 h-4 rounded" style="background: rgba(34, 197, 94, 0.6);"></div>
+                                <span>2 meals</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Insights -->
+                    <div class="glass p-6 mb-6">
+                        <h3 class="text-lg font-bold mb-4">💡 Insights & Recommendations</h3>
+                        <div id="statsInsights"></div>
+                    </div>
+
+                    <!-- Export Buttons -->
+                    <div class="glass p-6 mb-6">
+                        <h3 class="text-xl font-bold mb-4">📤 Export & Share</h3>
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
+                            <button id="exportCSV" class="btn-glass">
+                                <i class="fas fa-file-csv mr-2"></i>CSV
+                            </button>
+                            <button id="exportExcel" class="btn-glass bg-green-500 bg-opacity-20">
+                                <i class="fas fa-file-excel mr-2"></i>Excel
+                            </button>
+                            <button id="exportPDF" class="btn-glass bg-red-500 bg-opacity-20">
+                                <i class="fas fa-file-pdf mr-2"></i>PDF
+                            </button>
+                            <button id="exportImage" class="btn-glass bg-purple-500 bg-opacity-20">
+                                <i class="fas fa-image mr-2"></i>Image
+                            </button>
+                            <button id="emailReport" class="btn-glass bg-blue-500 bg-opacity-20">
+                                <i class="fas fa-envelope mr-2"></i>Email
+                            </button>
+                            <button id="printReport" class="btn-glass">
+                                <i class="fas fa-print mr-2"></i>Print
+                            </button>
+                            <button id="generateQR" class="btn-glass">
+                                <i class="fas fa-qrcode mr-2"></i>QR Code
+                            </button>
+                            <button id="shareReport" class="btn-glass">
+                                <i class="fas fa-share mr-2"></i>Share
+                            </button>
+                        </div>
+
+                        <!-- QR Code Display -->
+                        <div id="qrCodeContainer" class="hidden text-center">
+                            <h4 class="font-bold mb-2">Scan to View Report</h4>
+                            <canvas id="qrCodeCanvas" class="mx-auto mb-4"></canvas>
+                            <p class="text-sm opacity-60">Share this QR code with parents/guardians</p>
+                        </div>
+                    </div>
+
+                    <!-- Archived Summaries -->
+                    <div class="glass p-6">
+                        <h3 class="text-xl font-bold mb-4">Previous Months</h3>
+                        <div id="archivedSummaries">
+                            <!-- Archived summaries will be populated by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+
+                <div id="settings" class="page hidden">
+                    <div class="glass p-6">
+                        <h2 class="text-2xl font-bold mb-6">Settings</h2>
+
+                        <!-- Theme Settings -->
+                        <div class="mb-8">
+                            <h3 class="text-lg font-bold mb-4">Appearance</h3>
+                            <div class="flex items-center justify-between mb-4">
+                                <span>Theme</span>
+                                <select id="themeSelect" class="glass px-4 py-2 rounded-lg bg-transparent">
+                                    <option value="dark">Dark Glass</option>
+                                    <option value="light">Light Glass</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Performance Mode Settings -->
+                        <div class="mb-8">
+                            <h3 class="text-lg font-bold mb-4">
+                                <i class="fas fa-tachometer-alt mr-2"></i>⚡ Performance Mode
+                            </h3>
+                            <div class="glass p-4 rounded-lg mb-4">
+                                <div class="mb-4 p-3 glass rounded-lg bg-blue-500 bg-opacity-10">
+                                    <div class="flex items-center gap-2 mb-2">
+                                        <i class="fas fa-info-circle text-blue-400"></i>
+                                        <span class="font-bold">Choose Your Performance Level</span>
+                                    </div>
+                                    <p class="text-sm opacity-80">
+                                        Auto-detected: <span id="detectedPerformance"
+                                            class="font-bold text-blue-400">Detecting...</span>
+                                    </p>
+                                    <p class="text-xs opacity-70 mt-1">
+                                        Select your preferred mode below. Changes apply immediately.
+                                    </p>
+                                </div>
+                                <div class="mb-4">
+                                    <div class="space-y-3">
+                                        <label
+                                            class="flex items-center justify-between p-3 glass rounded-lg cursor-pointer hover:bg-white hover:bg-opacity-5 transition">
+                                            <div class="flex items-center gap-3">
+                                                <input type="radio" name="performanceMode" value="high" class="w-4 h-4">
+                                                <div>
+                                                    <div class="font-bold">🚀 High Performance</div>
+                                                    <div class="text-xs opacity-70">Optimized animations (0.4s), all
+                                                        effects enabled</div>
+                                                </div>
+                                            </div>
+                                        </label>
+
+                                        <label
+                                            class="flex items-center justify-between p-3 glass rounded-lg cursor-pointer hover:bg-white hover:bg-opacity-5 transition">
+                                            <div class="flex items-center gap-3">
+                                                <input type="radio" name="performanceMode" value="medium"
+                                                    class="w-4 h-4">
+                                                <div>
+                                                    <div class="font-bold">⚡ Balanced</div>
+                                                    <div class="text-xs opacity-70">Fast animations (0.3s), reduced blur
+                                                        & particles</div>
+                                                </div>
+                                            </div>
+                                        </label>
+
+                                        <label
+                                            class="flex items-center justify-between p-3 glass rounded-lg cursor-pointer hover:bg-white hover:bg-opacity-5 transition">
+                                            <div class="flex items-center gap-3">
+                                                <input type="radio" name="performanceMode" value="low" class="w-4 h-4">
+                                                <div>
+                                                    <div class="font-bold">💾 Battery Saver</div>
+                                                    <div class="text-xs opacity-70">Instant animations (0.15s), no
+                                                        particles, minimal blur</div>
+                                                </div>
+                                            </div>
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <div class="glass p-3 rounded-lg text-xs opacity-80">
+                                    <div class="font-bold mb-2"><i class="fas fa-info-circle mr-1"></i>What changes?
+                                    </div>
+                                    <ul class="space-y-1 ml-4">
+                                        <li>• <strong>High:</strong> Animations 0.4s, blur 8-30px, all particles</li>
+                                        <li>• <strong>Balanced:</strong> Animations 0.3s, blur 6-18px, 8 particles</li>
+                                        <li>• <strong>Battery Saver:</strong> Animations 0.15s, blur 3-9px, no particles
+                                        </li>
+                                    </ul>
+                                    <p class="mt-2 text-xs opacity-60">
+                                        💡 Tip: All modes have reduced animations for better performance!
+                                    </p>
+                                </div>
+
+                                <div id="deviceInfo" class="mt-3 p-3 glass rounded-lg text-xs">
+                                    <div class="font-bold mb-2">📱 Device Information</div>
+                                    <div class="space-y-1 opacity-80">
+                                        <div>CPU Cores: <span id="deviceCores">-</span></div>
+                                        <div>RAM: <span id="deviceMemory">-</span></div>
+                                        <div>Connection: <span id="deviceConnection">-</span></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Meal Times Settings -->
+                        <div class="mb-8">
+                            <h3 class="text-lg font-bold mb-4">Meal Times</h3>
+                            <div class="space-y-4">
+                                <div class="flex items-center justify-between">
+                                    <span>Lunch Time</span>
+                                    <input type="time" id="lunchTime" class="glass px-3 py-2 rounded-lg bg-transparent">
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <span>Dinner Time</span>
+                                    <input type="time" id="dinnerTime"
+                                        class="glass px-3 py-2 rounded-lg bg-transparent">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Notification Settings -->
+                        <div class="mb-8">
+                            <h3 class="text-lg font-bold mb-4">Notifications</h3>
+                            <div class="flex items-center justify-between mb-4">
+                                <span>Daily Reminders</span>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" id="notificationToggle" class="sr-only peer">
+                                    <div
+                                        class="w-11 h-6 bg-gray-600 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600">
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Install App -->
+                        <div class="mb-8">
+                            <h3 class="text-lg font-bold mb-4">Install</h3>
+                            <div class="space-y-3">
+                                <button id="installAppBtn" class="btn-glass hidden">
+                                    <i class="fas fa-download mr-2"></i>Install App
+                                </button>
+                                <div id="installIosHint" class="text-sm opacity-80 hidden">
+                                    On iPhone/iPad: Open in Safari, tap the <i class="fas fa-share-alt"></i> Share
+                                    button, then choose <b>Add to Home Screen</b>.
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Backup Settings -->
+                        <div class="mb-8">
+                            <h3 class="text-lg font-bold mb-4">
+                                <i class="fas fa-database mr-2"></i>💾 Backup & Data Safety
+                            </h3>
+                            <div class="glass p-4 rounded-lg mb-4">
+                                <!-- Backup Status -->
+                                <div class="mb-4 p-3 glass rounded-lg">
+                                    <div class="flex items-center justify-between mb-2">
+                                        <span class="font-bold">Backup Status:</span>
+                                        <span id="backupStatus" class="text-green-400">Loading...</span>
+                                    </div>
+                                    <div class="text-xs opacity-60">
+                                        Last backup: <span id="lastBackupDate">Never</span>
+                                    </div>
+                                </div>
+
+                                <!-- Auto Backup Toggle -->
+                                <div class="flex items-center justify-between mb-4">
+                                    <div>
+                                        <span class="font-bold">Auto-Backup Reminders</span>
+                                        <p class="text-xs opacity-60">Get reminded to backup your data</p>
+                                    </div>
+                                    <label class="relative inline-flex items-center cursor-pointer">
+                                        <input type="checkbox" id="autoBackupToggle" class="sr-only peer" checked>
+                                        <div
+                                            class="w-11 h-6 bg-gray-600 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600">
+                                        </div>
+                                    </label>
+                                </div>
+
+                                <!-- Backup Frequency -->
+                                <div class="mb-4">
+                                    <label class="block text-sm mb-2">Backup Frequency</label>
+                                    <select id="backupFrequency"
+                                        class="glass px-4 py-2 rounded-lg bg-transparent w-full">
+                                        <option value="3">Every 3 days</option>
+                                        <option value="7" selected>Every week</option>
+                                        <option value="14">Every 2 weeks</option>
+                                        <option value="30">Every month</option>
+                                    </select>
+                                </div>
+
+                                <!-- Manual Backup Button -->
+                                <button id="manualBackupBtn" class="btn-glass w-full bg-blue-500 bg-opacity-20">
+                                    <i class="fas fa-download mr-2"></i>Create Backup Now
+                                </button>
+
+                                <!-- Backup History -->
+                                <div class="mt-4">
+                                    <h4 class="font-bold text-sm mb-2">Recent Backups</h4>
+                                    <div id="backupHistory" class="space-y-2"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- GitHub Cloud Sync Settings -->
+                        <div class="mb-8">
+                            <h3 class="text-lg font-bold mb-4">
+                                <i class="fab fa-github mr-2"></i>GitHub Cloud Sync
+                            </h3>
+                            <div class="glass p-4 rounded-lg mb-4">
+                                <div class="flex items-center gap-2 mb-3 text-sm">
+                                    <i class="fas fa-shield-alt text-green-400"></i>
+                                    <p class="opacity-70">Your token is stored locally on your device only - never
+                                        uploaded to the cloud.</p>
+                                </div>
+                                <div class="space-y-3">
+                                    <div>
+                                        <label class="block text-xs mb-1 opacity-80">GitHub Username</label>
+                                        <input type="text" id="ghUsername"
+                                            class="glass w-full px-3 py-2 rounded-lg bg-transparent text-sm"
+                                            placeholder="e.g., yourname">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs mb-1 opacity-80">Repository Name</label>
+                                        <input type="text" id="ghRepo"
+                                            class="glass w-full px-3 py-2 rounded-lg bg-transparent text-sm"
+                                            placeholder="e.g., mess-track-data">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs mb-1 opacity-80">
+                                            Personal Access Token
+                                            <a href="https://github.com/settings/tokens/new" target="_blank"
+                                                class="text-blue-400 hover:underline text-xs ml-1">
+                                                (Get Token)
+                                            </a>
+                                        </label>
+                                        <input type="password" id="ghToken"
+                                            class="glass w-full px-3 py-2 rounded-lg bg-transparent text-sm"
+                                            placeholder="ghp_xxxxxxxxxxxx">
+                                        <p class="text-xs opacity-60 mt-1">Required scope: <code
+                                                class="bg-black bg-opacity-20 px-1 rounded">repo</code></p>
+                                    </div>
+                                    <button id="saveGitHubSettings" class="btn-glass w-full mt-2 text-sm">
+                                        <i class="fas fa-save mr-2"></i>Save & Test Connection
+                                    </button>
+                                    <button id="manualSyncBtn"
+                                        class="btn-glass w-full mt-2 text-sm bg-blue-500 bg-opacity-20">
+                                        <i class="fas fa-cloud-upload-alt mr-2"></i>Backup Current Month Now
+                                    </button>
+                                    <button id="viewOnGitHubBtn"
+                                        class="btn-glass w-full mt-2 text-sm bg-green-500 bg-opacity-20">
+                                        <i class="fab fa-github mr-2"></i>View Repository on GitHub
+                                    </button>
+                                </div>
+                                <div class="mt-4 p-3 glass rounded-lg text-xs opacity-80">
+                                    <div class="font-bold mb-2"><i class="fas fa-info-circle mr-1"></i>How it works:
+                                    </div>
+                                    <ul class="space-y-1 ml-4">
+                                        <li>• When a month ends, data auto-syncs to GitHub as
+                                            <code>data/YYYY-MM.json</code>
+                                        </li>
+                                        <li>• Your attendance history is preserved forever in your repository</li>
+                                        <li>• Access your data from any device or download the JSON files anytime</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Data Management -->
+                        <div class="mb-8">
+                            <h3 class="text-lg font-bold mb-4">Data Management</h3>
+                            <div class="flex flex-wrap gap-4">
+                                <button id="exportData" class="btn-glass">
+                                    <i class="fas fa-download mr-2"></i>Export All Data
+                                </button>
+                                <button id="importData" class="btn-glass">
+                                    <i class="fas fa-upload mr-2"></i>Import Data
+                                </button>
+                                <button id="resetData" class="btn-glass bg-red-500 bg-opacity-20">
+                                    <i class="fas fa-trash mr-2"></i>Reset All Data
+                                </button>
+                            </div>
+                            <input type="file" id="importFile" accept=".json" class="hidden">
+                        </div>
+
+                        <!-- About -->
+                        <div>
+                            <h3 class="text-lg font-bold mb-4">About MessTrack</h3>
+                            <div class="space-y-4">
+                                <div class="glass p-4 rounded-lg">
+                                    <div class="flex items-center gap-3 mb-3">
+                                        <div class="text-3xl">🍽️</div>
+                                        <div>
+                                            <p class="font-bold">MessTrack v2.0.0</p>
+                                            <p class="text-xs opacity-70">Enhanced Edition</p>
+                                        </div>
+                                    </div>
+                                    <p class="text-sm opacity-80 leading-relaxed">
+                                        A modern, offline-first mess attendance tracker designed specifically for hostel
+                                        students. Track your meals, monitor attendance patterns, and manage your mess
+                                        schedule effortlessly.
+                                    </p>
+                                </div>
+
+                                <div class="glass p-4 rounded-lg">
+                                    <h4 class="font-bold text-sm mb-2">✨ Key Features</h4>
+                                    <ul class="text-xs space-y-1 opacity-80">
+                                        <li>• Offline-first architecture with PWA support</li>
+                                        <li>• Quick attendance marking with FAB</li>
+                                        <li>• Weekly & monthly views</li>
+                                        <li>• Bulk edit mode for multiple days</li>
+                                        <li>• QR code sharing & PDF/CSV export</li>
+                                        <li>• Custom meal times & notifications</li>
+                                        <li>• Dark/Light glassmorphism themes</li>
+                                    </ul>
+                                </div>
+
+                                <div class="glass p-4 rounded-lg">
+                                    <h4 class="font-bold text-sm mb-2">📊 Privacy & Data</h4>
+                                    <p class="text-xs opacity-80 leading-relaxed">
+                                        All your data is stored locally on your device using browser LocalStorage. We
+                                        don't collect, store, or transmit any personal information. Your privacy is our
+                                        priority.
+                                    </p>
+                                </div>
+
+                                <div class="glass p-4 rounded-lg">
+                                    <h4 class="font-bold text-sm mb-2">🚀 Technology</h4>
+                                    <p class="text-xs opacity-80">
+                                        Built with vanilla JavaScript, TailwindCSS, and modern PWA standards. No
+                                        frameworks, no bloat - just pure performance.
+                                    </p>
+                                </div>
+
+                                <div class="text-center pt-2">
+                                    <p class="text-xs opacity-60">© 2024 MessTrack. All rights reserved.</p>
+                                    <p class="text-xs opacity-60 mt-1">Made with ❤️ for hostel students</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Calendar Integration Section -->
+                        <div class="mb-8">
+                            <h3 class="text-lg font-bold mb-4">
+                                <i class="fas fa-calendar-alt mr-2"></i>Calendar Export
+                            </h3>
+                            <div class="glass p-4 rounded-lg">
+                                <button id="quickExportIcs" class="btn-glass w-full mb-3">
+                                    <i class="fas fa-download mr-2"></i>Export Current Month to Calendar
+                                </button>
+                                <a href="#"
+                                    onclick="document.getElementById('calendarSection').classList.toggle('hidden'); return false;"
+                                    class="text-sm text-blue-400 underline">
+                                    Advanced Calendar Settings
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Themes Page -->
+    <div id="themes" class="page hidden">
+        <div class="max-w-4xl mx-auto p-4 pb-24">
+            <h1 class="text-3xl font-bold mb-6 glass p-4 rounded-lg">
+                <i class="fas fa-palette mr-2"></i>Customize Themes
+            </h1>
+
+            <!-- Current Theme Display -->
+            <div class="glass p-6 mb-6 rounded-xl">
+                <h2 class="text-xl font-bold mb-3">Current Theme</h2>
+                <div id="currentThemeDisplay" class="flex items-center justify-between">
+                    <span id="currentThemeName" class="text-lg">Ocean Blue</span>
+                    <div class="flex gap-2">
+                        <span class="w-8 h-8 rounded-full" id="themeColor1"></span>
+                        <span class="w-8 h-8 rounded-full" id="themeColor2"></span>
+                        <span class="w-8 h-8 rounded-full" id="themeColor3"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Theme Presets -->
+            <div class="glass p-6 mb-6 rounded-xl">
+                <h2 class="text-xl font-bold mb-4">Popular Presets</h2>
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
+                    <!-- Ocean Blue -->
+                    <div class="theme-preset glass p-4 rounded-lg cursor-pointer hover:scale-105 transition-all"
+                        data-theme="ocean">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="font-medium">Ocean Blue</span>
+                            <i class="fas fa-water text-blue-400"></i>
+                        </div>
+                        <div class="flex gap-1">
+                            <span class="w-6 h-6 rounded-full bg-blue-500"></span>
+                            <span class="w-6 h-6 rounded-full bg-cyan-500"></span>
+                            <span class="w-6 h-6 rounded-full bg-indigo-500"></span>
+                        </div>
+                    </div>
+
+                    <!-- Sunset Orange -->
+                    <div class="theme-preset glass p-4 rounded-lg cursor-pointer hover:scale-105 transition-all"
+                        data-theme="sunset">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="font-medium">Sunset</span>
+                            <i class="fas fa-sun text-orange-400"></i>
+                        </div>
+                        <div class="flex gap-1">
+                            <span class="w-6 h-6 rounded-full bg-orange-500"></span>
+                            <span class="w-6 h-6 rounded-full bg-pink-500"></span>
+                            <span class="w-6 h-6 rounded-full bg-yellow-500"></span>
+                        </div>
+                    </div>
+
+                    <!-- Forest Green -->
+                    <div class="theme-preset glass p-4 rounded-lg cursor-pointer hover:scale-105 transition-all"
+                        data-theme="forest">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="font-medium">Forest</span>
+                            <i class="fas fa-tree text-green-400"></i>
+                        </div>
+                        <div class="flex gap-1">
+                            <span class="w-6 h-6 rounded-full bg-green-500"></span>
+                            <span class="w-6 h-6 rounded-full bg-emerald-500"></span>
+                            <span class="w-6 h-6 rounded-full bg-teal-500"></span>
+                        </div>
+                    </div>
+
+                    <!-- Purple Dream -->
+                    <div class="theme-preset glass p-4 rounded-lg cursor-pointer hover:scale-105 transition-all"
+                        data-theme="purple">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="font-medium">Purple Dream</span>
+                            <i class="fas fa-magic text-purple-400"></i>
+                        </div>
+                        <div class="flex gap-1">
+                            <span class="w-6 h-6 rounded-full bg-purple-500"></span>
+                            <span class="w-6 h-6 rounded-full bg-pink-500"></span>
+                            <span class="w-6 h-6 rounded-full bg-indigo-500"></span>
+                        </div>
+                    </div>
+
+                    <!-- Midnight Dark -->
+                    <div class="theme-preset glass p-4 rounded-lg cursor-pointer hover:scale-105 transition-all"
+                        data-theme="midnight">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="font-medium">Midnight</span>
+                            <i class="fas fa-moon text-gray-400"></i>
+                        </div>
+                        <div class="flex gap-1">
+                            <span class="w-6 h-6 rounded-full bg-gray-800"></span>
+                            <span class="w-6 h-6 rounded-full bg-gray-700"></span>
+                            <span class="w-6 h-6 rounded-full bg-blue-900"></span>
+                        </div>
+                    </div>
+
+                    <!-- Neon Cyber -->
+                    <div class="theme-preset glass p-4 rounded-lg cursor-pointer hover:scale-105 transition-all"
+                        data-theme="neon">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="font-medium">Neon</span>
+                            <i class="fas fa-bolt text-cyan-400"></i>
+                        </div>
+                        <div class="flex gap-1">
+                            <span class="w-6 h-6 rounded-full bg-cyan-400"></span>
+                            <span class="w-6 h-6 rounded-full bg-pink-500"></span>
+                            <span class="w-6 h-6 rounded-full bg-purple-500"></span>
+                        </div>
+                    </div>
+
+                    <!-- Solar Light -->
+                    <div class="theme-preset glass p-4 rounded-lg cursor-pointer hover:scale-105 transition-all"
+                        data-theme="solar">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="font-medium">Solar</span>
+                            <i class="fas fa-sun text-yellow-300"></i>
+                        </div>
+                        <div class="flex gap-1">
+                            <span class="w-6 h-6 rounded-full bg-yellow-300"></span>
+                            <span class="w-6 h-6 rounded-full bg-amber-400"></span>
+                            <span class="w-6 h-6 rounded-full bg-orange-300"></span>
+                        </div>
+                    </div>
+
+                    <!-- Matrix Green -->
+                    <div class="theme-preset glass p-4 rounded-lg cursor-pointer hover:scale-105 transition-all"
+                        data-theme="matrix">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="font-medium">Matrix</span>
+                            <i class="fas fa-code text-green-400"></i>
+                        </div>
+                        <div class="flex gap-1">
+                            <span class="w-6 h-6 rounded-full bg-green-400"></span>
+                            <span class="w-6 h-6 rounded-full bg-black"></span>
+                            <span class="w-6 h-6 rounded-full bg-green-600"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Custom Theme Builder -->
+            <div class="glass p-6 mb-6 rounded-xl">
+                <h2 class="text-xl font-bold mb-4">Build Custom Theme</h2>
+
+                <!-- Theme Name -->
+                <div class="mb-4">
+                    <label class="block text-sm mb-2 opacity-80">Theme Name</label>
+                    <input type="text" id="customThemeName" class="glass w-full px-4 py-2 rounded-lg bg-transparent"
+                        placeholder="My Custom Theme">
+                </div>
+
+                <!-- Color Pickers -->
+                <div class="mb-4">
+                    <label class="block text-sm mb-2 opacity-80">Primary Color</label>
+                    <div class="flex items-center gap-3">
+                        <input type="color" id="primaryColor" class="w-16 h-10 rounded cursor-pointer">
+                        <input type="text" id="primaryColorHex" class="glass flex-1 px-3 py-2 rounded-lg bg-transparent"
+                            placeholder="#6366f1">
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label class="block text-sm mb-2 opacity-80">Secondary Color</label>
+                    <div class="flex items-center gap-3">
+                        <input type="color" id="secondaryColor" class="w-16 h-10 rounded cursor-pointer">
+                        <input type="text" id="secondaryColorHex"
+                            class="glass flex-1 px-3 py-2 rounded-lg bg-transparent" placeholder="#a855f7">
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label class="block text-sm mb-2 opacity-80">Accent Color</label>
+                    <div class="flex items-center gap-3">
+                        <input type="color" id="accentColor" class="w-16 h-10 rounded cursor-pointer">
+                        <input type="text" id="accentColorHex" class="glass flex-1 px-3 py-2 rounded-lg bg-transparent"
+                            placeholder="#ec4899">
+                    </div>
+                </div>
+
+                <!-- Glass Settings -->
+                <div class="mb-4">
+                    <label class="block text-sm mb-2 opacity-80">Glass Blur Intensity</label>
+                    <input type="range" id="blurIntensity" min="5" max="30" value="15" class="w-full">
+                    <div class="flex justify-between text-xs opacity-60">
+                        <span>Minimal</span>
+                        <span id="blurValue">15px</span>
+                        <span>Maximum</span>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label class="block text-sm mb-2 opacity-80">Glass Opacity</label>
+                    <input type="range" id="glassOpacity" min="5" max="30" value="10" class="w-full">
+                    <div class="flex justify-between text-xs opacity-60">
+                        <span>Clear</span>
+                        <span id="opacityValue">10%</span>
+                        <span>Opaque</span>
+                    </div>
+                </div>
+
+                <!-- Preview Button -->
+                <button id="previewTheme" class="btn-glass w-full mb-3">
+                    <i class="fas fa-eye mr-2"></i>Preview Theme
+                </button>
+
+                <!-- Save Custom Theme -->
+                <button id="saveCustomTheme" class="btn-glass w-full">
+                    <i class="fas fa-save mr-2"></i>Save as Custom Theme
+                </button>
+            </div>
+
+            <!-- Saved Custom Themes -->
+            <div class="glass p-6 mb-6 rounded-xl">
+                <h2 class="text-xl font-bold mb-4">My Custom Themes</h2>
+                <div id="customThemesList" class="space-y-3">
+                    <!-- Custom themes will be dynamically added here -->
+                    <p class="text-sm opacity-60">No custom themes saved yet</p>
+                </div>
+            </div>
+
+            <!-- Theme Actions -->
+            <div class="glass p-6 rounded-xl">
+                <h2 class="text-xl font-bold mb-4">Theme Actions</h2>
+                <div class="space-y-3">
+                    <button id="resetToDefault" class="btn-glass w-full">
+                        <i class="fas fa-undo mr-2"></i>Reset to Default
+                    </button>
+                    <button id="exportTheme" class="btn-glass w-full">
+                        <i class="fas fa-download mr-2"></i>Export Current Theme
+                    </button>
+                    <button id="importTheme" class="btn-glass w-full">
+                        <i class="fas fa-upload mr-2"></i>Import Theme
+                    </button>
+                    <input type="file" id="themeFileInput" accept=".json" class="hidden">
+                </div>
+            </div>
+
+            <!-- Apply/Cancel Buttons -->
+            <div class="fixed bottom-24 left-0 right-0 p-4 glass" id="themeApplyBar" style="display: none;">
+                <div class="max-w-4xl mx-auto flex gap-3">
+                    <button id="applyThemeBtn" class="btn-glass flex-1 bg-green-500 bg-opacity-20">
+                        <i class="fas fa-check mr-2"></i>Apply Theme
+                    </button>
+                    <button id="cancelThemeBtn" class="btn-glass flex-1 bg-red-500 bg-opacity-20">
+                        <i class="fas fa-times mr-2"></i>Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Calendar Integration Section (Within Settings Page) -->
+    <div id="calendarSection" class="hidden mb-8">
+        <div class="glass p-6 mb-6 rounded-xl">
+            <h2 class="text-xl font-bold mb-4">
+                <i class="fas fa-calendar-alt mr-2"></i>Calendar Integration
+            </h2>
+
+            <!-- Export Options -->
+            <div class="mb-4">
+                <h3 class="text-lg font-semibold mb-3">Export to Calendar</h3>
+                <div class="space-y-3">
+                    <button id="exportToIcs" class="btn-glass w-full">
+                        <i class="fas fa-download mr-2"></i>Download .ics File (Works with all calendars)
+                    </button>
+                    <button id="exportToGoogle" class="btn-glass w-full bg-blue-500 bg-opacity-20">
+                        <i class="fab fa-google mr-2"></i>Export to Google Calendar
+                    </button>
+                    <button id="exportToOutlook" class="btn-glass w-full bg-blue-600 bg-opacity-20">
+                        <i class="fab fa-microsoft mr-2"></i>Export to Outlook Calendar
+                    </button>
+                </div>
+            </div>
+
+            <!-- Export Settings -->
+            <div class="mb-4">
+                <h3 class="text-lg font-semibold mb-3">Export Settings</h3>
+                <div class="space-y-3">
+                    <div>
+                        <label class="block text-sm mb-2 opacity-80">Date Range</label>
+                        <select id="calendarDateRange" class="glass w-full px-3 py-2 rounded-lg bg-transparent">
+                            <option value="currentMonth">Current Month</option>
+                            <option value="lastMonth">Last Month</option>
+                            <option value="last30">Last 30 Days</option>
+                            <option value="last90">Last 90 Days</option>
+                            <option value="custom">Custom Range</option>
+                            <option value="all">All Time</option>
+                        </select>
+                    </div>
+
+                    <!-- Custom Date Range (hidden by default) -->
+                    <div id="customCalendarRange" class="hidden space-y-2">
+                        <input type="date" id="calendarStartDate"
+                            class="glass w-full px-3 py-2 rounded-lg bg-transparent">
+                        <input type="date" id="calendarEndDate"
+                            class="glass w-full px-3 py-2 rounded-lg bg-transparent">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm mb-2 opacity-80">Event Style</label>
+                        <select id="calendarEventStyle" class="glass w-full px-3 py-2 rounded-lg bg-transparent">
+                            <option value="separate">Separate Events (Lunch & Dinner)</option>
+                            <option value="combined">Combined Daily Event</option>
+                        </select>
+                    </div>
+
+                    <div class="flex items-center justify-between">
+                        <span class="text-sm opacity-80">Include Skip Reasons</span>
+                        <input type="checkbox" id="includeSkipReasons" class="rounded">
+                    </div>
+
+                    <div class="flex items-center justify-between">
+                        <span class="text-sm opacity-80">Add Reminders</span>
+                        <input type="checkbox" id="addCalendarReminders" class="rounded">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Google Calendar Auto-Sync -->
+            <div class="mb-4">
+                <h3 class="text-lg font-semibold mb-3">Auto-Sync (Beta)</h3>
+                <div class="glass p-4 rounded-lg">
+                    <div class="flex items-center gap-2 mb-3 text-sm">
+                        <i class="fab fa-google text-blue-400"></i>
+                        <p class="opacity-80">Connect Google Calendar for automatic sync</p>
+                    </div>
+                    <button id="connectGoogleCalendar" class="btn-glass w-full">
+                        <i class="fas fa-link mr-2"></i>Connect Google Calendar
+                    </button>
+                    <div id="googleCalendarStatus" class="hidden mt-3 p-3 glass rounded-lg text-sm">
+                        <div class="flex items-center gap-2">
+                            <i class="fas fa-check-circle text-green-400"></i>
+                            <span>Connected to Google Calendar</span>
+                        </div>
+                        <button id="disconnectGoogleCalendar" class="btn-glass mt-2 text-xs">
+                            Disconnect
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Floating Action Button -->
+    <div id="fab" class="fixed bottom-20 right-6 z-50">
+        <button id="fabMain"
+            class="glass w-16 h-16 rounded-full flex items-center justify-center text-2xl shadow-lg transition-all duration-300 hover:scale-110">
+            <i class="fas fa-plus"></i>
+        </button>
+
+        <!-- FAB Menu -->
+        <div id="fabMenu"
+            class="absolute bottom-20 right-0 space-y-3 opacity-0 pointer-events-none transition-all duration-300">
+            <button id="fabLunch"
+                class="glass w-14 h-14 rounded-full flex items-center justify-center shadow-lg hover:scale-110 transition-all"
+                title="Mark Lunch">
+                <i class="fas fa-sun text-yellow-400"></i>
+            </button>
+            <button id="fabDinner"
+                class="glass w-14 h-14 rounded-full flex items-center justify-center shadow-lg hover:scale-110 transition-all"
+                title="Mark Dinner">
+                <i class="fas fa-moon text-blue-400"></i>
+            </button>
+            <button id="fabNote"
+                class="glass w-14 h-14 rounded-full flex items-center justify-center shadow-lg hover:scale-110 transition-all"
+                title="Add Note">
+                <i class="fas fa-sticky-note text-green-400"></i>
+            </button>
+            <button id="fabSkip"
+                class="glass w-14 h-14 rounded-full flex items-center justify-center shadow-lg hover:scale-110 transition-all"
+                title="Skip Meal">
+                <i class="fas fa-times-circle text-red-400"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Skip Reason Modal -->
+    <div id="skipReasonModal"
+        class="fixed inset-0 bg-black bg-opacity-50 z-60 hidden flex items-center justify-center p-4">
+        <div class="glass p-6 max-w-md w-full">
+            <h3 class="text-xl font-bold mb-4">Why did you skip this meal?</h3>
+            <div class="space-y-3 mb-4">
+                <button class="skip-reason w-full text-left p-3 glass rounded-lg hover:bg-white hover:bg-opacity-10"
+                    data-reason="Class/Study">
+                    <i class="fas fa-book mr-2"></i>Class/Study
+                </button>
+                <button class="skip-reason w-full text-left p-3 glass rounded-lg hover:bg-white hover:bg-opacity-10"
+                    data-reason="Travel">
+                    <i class="fas fa-plane mr-2"></i>Travel
+                </button>
+                <button class="skip-reason w-full text-left p-3 glass rounded-lg hover:bg-white hover:bg-opacity-10"
+                    data-reason="Sick">
+                    <i class="fas fa-heart-broken mr-2"></i>Not feeling well
+                </button>
+                <button class="skip-reason w-full text-left p-3 glass rounded-lg hover:bg-white hover:bg-opacity-10"
+                    data-reason="Outside">
+                    <i class="fas fa-utensils mr-2"></i>Eating outside
+                </button>
+                <button class="skip-reason w-full text-left p-3 glass rounded-lg hover:bg-white hover:bg-opacity-10"
+                    data-reason="Other">
+                    <i class="fas fa-question mr-2"></i>Other
+                </button>
+            </div>
+            <textarea id="customReason" class="w-full p-3 glass rounded-lg bg-transparent"
+                placeholder="Custom reason (optional)" rows="3"></textarea>
+            <div class="flex gap-3 mt-4">
+                <button id="saveSkipReason" class="btn-glass flex-1">Save</button>
+                <button id="cancelSkipReason" class="btn-glass flex-1">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+        <div class="max-w-lg mx-auto">
+            <div class="flex justify-around items-center px-4">
+                <div class="nav-item active" data-page="dashboard">
+                    <i class="fas fa-home"></i>
+                    <span>Home</span>
+                </div>
+                <div class="nav-item" data-page="weekly">
+                    <i class="fas fa-calendar-week"></i>
+                    <span>Weekly</span>
+                </div>
+                <div class="nav-item" data-page="history">
+                    <i class="fas fa-calendar-alt"></i>
+                    <span>History</span>
+                </div>
+                <div class="nav-item" data-page="summary">
+                    <i class="fas fa-chart-bar"></i>
+                    <span>Stats</span>
+                </div>
+                <div class="nav-item" data-page="settings">
+                    <i class="fas fa-cog"></i>
+                    <span>Settings</span>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast">
+        <span id="toastMessage"></span>
+    </div>
+    <!-- Enhanced Core Functions (Load First) -->
+    <script src="enhanced-core-functions.js"></script>
+    <!-- Enhanced App Improvements -->
+    <script src="enhanced-app-improvements.js"></script>
+    <!-- Enhanced Module Improvements -->
+    <script src="enhanced-module-improvements.js"></script>
+    <!-- Device Performance Optimizer -->
+    <script src="device-optimizer.js"></script>
+    <!-- Undo/Redo Manager -->
+    <script src="undo-manager.js"></script>
+    <!-- Notification Manager -->
+    <script src="notification-manager.js"></script>
+    <!-- Statistics Manager -->
+    <script src="statistics-manager.js"></script>
+    <!-- Backup Manager -->
+    <script src="backup-manager.js"></script>
+    <!-- Advanced Export Manager -->
+    <script src="advanced-export.js"></script>
+    <!-- Critical Fixes & Optimizations -->
+    <script src="app-fixes.js"></script>
+    <!-- Main App JavaScript -->
+    <script src="app.js"></script>
+    <!-- Button Enhancement System -->
+    <script src="button-enhancements.js"></script>
+    <!-- Glassmorphism UI Enhancer -->
+    <script src="glass-ui-enhancer.js"></script>
+    <!-- Calendar Integration -->
+    <script src="calendar-integration.js"></script>
+</body>
+
+</html>

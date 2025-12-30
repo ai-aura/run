@@ -1,0 +1,302 @@
+/* 🎬 Reduced Animations Stylesheet for MessTrack */
+/* Simplified, faster animations for better performance */
+
+/* ==========================================
+   GLOBAL ANIMATION REDUCTION
+   ========================================== */
+
+/* Reduce all animation durations globally */
+* {
+    animation-duration: 0.2s !important;
+    transition-duration: 0.2s !important;
+}
+
+/* Disable complex background animations */
+body::before,
+body::after {
+    animation: none !important;
+    opacity: 0.3 !important;
+}
+
+/* Simplify glass panel shimmer */
+.glass-panel::before,
+.card::after {
+    animation: none !important;
+    display: none !important;
+}
+
+/* Disable floating orbs */
+.particle-container {
+    display: none !important;
+}
+
+/* Simplify button animations */
+.btn-glass::before,
+button:not(.nav-item)::before {
+    animation: none !important;
+    transition: opacity 0.2s !important;
+}
+
+/* Faster hover effects */
+.btn-glass:hover,
+button:hover,
+.nav-item:hover {
+    transition: all 0.2s ease !important;
+}
+
+/* Simplify navigation animations */
+.nav-item::before,
+.nav-item::after {
+    transition: all 0.2s ease !important;
+}
+
+/* Faster page transitions */
+.page {
+    animation-duration: 0.2s !important;
+}
+
+/* Simplify calendar day hover */
+.calendar-day:hover {
+    transform: scale(1.02) !important;
+    transition: transform 0.2s ease !important;
+}
+
+/* Reduce attendance button animations */
+.attendance-btn {
+    transition: all 0.2s ease !important;
+}
+
+.attendance-btn:hover {
+    transform: translateY(-2px) !important;
+}
+
+/* Simplify toast animations */
+.toast {
+    transition: all 0.2s ease !important;
+}
+
+/* Faster modal animations */
+.modal,
+.modal-backdrop {
+    animation-duration: 0.2s !important;
+}
+
+/* Simplify FAB animations */
+.fab-menu {
+    animation-duration: 0.2s !important;
+}
+
+/* Reduce ripple effect duration */
+@keyframes ripple {
+    to {
+        transform: scale(2);
+        opacity: 0;
+    }
+}
+
+/* Faster skeleton loading */
+.skeleton {
+    animation-duration: 1s !important;
+}
+
+/* Simplify stat card animations */
+.stat-card::before {
+    animation: none !important;
+}
+
+/* Disable progress bar wave */
+.progress-bar::after {
+    animation: none !important;
+}
+
+/* Faster reveal animations */
+.glass-reveal {
+    animation-duration: 0.3s !important;
+}
+
+/* Simplify mesh animation */
+@keyframes meshAnimation {
+    0%, 100% { transform: none; }
+    50% { transform: none; }
+}
+
+/* Disable floating orbs animation */
+@keyframes floatingOrbs {
+    0%, 100% { transform: none; }
+}
+
+/* Faster gradient rotation */
+@keyframes gradientRotate {
+    0%, 100% { transform: none; }
+}
+
+/* Simplify pulse animation */
+@keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.8; transform: scale(1.05); }
+}
+
+/* Faster scanline */
+@keyframes scanline {
+    0%, 100% { transform: none; }
+}
+
+/* Disable shimmer */
+@keyframes shimmer {
+    0%, 100% { transform: none; }
+}
+
+/* Faster wave animation */
+@keyframes wave {
+    0%, 100% { left: 0; }
+}
+
+/* ==========================================
+   PERFORMANCE MODE SPECIFIC
+   ========================================== */
+
+/* High Performance - Keep some animations but still optimized */
+body[data-performance="high"] * {
+    animation-duration: 0.4s !important;
+    transition-duration: 0.3s !important;
+}
+
+/* Balanced - Moderate animations */
+body[data-performance="medium"] * {
+    animation-duration: 0.3s !important;
+    transition-duration: 0.3s !important;
+}
+
+body[data-performance="medium"] body::before,
+body[data-performance="medium"] body::after {
+    animation-duration: 20s !important;
+}
+
+/* Battery Saver - Minimal animations */
+body[data-performance="low"] * {
+    animation-duration: 0.15s !important;
+    transition-duration: 0.15s !important;
+}
+
+body[data-performance="low"] body::before,
+body[data-performance="low"] body::after {
+    animation: none !important;
+    opacity: 0.2 !important;
+}
+
+body[data-performance="low"] .glass-panel::before {
+    display: none !important;
+}
+
+/* ==========================================
+   MOBILE OPTIMIZATIONS
+   ========================================== */
+
+@media (max-width: 768px) {
+    * {
+        animation-duration: 0.15s !important;
+        transition-duration: 0.15s !important;
+    }
+    
+    body::before,
+    body::after {
+        animation-duration: 30s !important;
+        opacity: 0.2 !important;
+    }
+    
+    .particle-container {
+        display: none !important;
+    }
+}
+
+/* ==========================================
+   ACCESSIBILITY - RESPECT USER PREFERENCES
+   ========================================== */
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+    
+    body::before,
+    body::after {
+        animation: none !important;
+    }
+    
+    .particle-container {
+        display: none !important;
+    }
+}
+
+/* ==========================================
+   DISABLE EXPENSIVE EFFECTS
+   ========================================== */
+
+/* Disable 3D transforms on low-end */
+body[data-performance="low"] .card,
+body[data-performance="low"] .glass-panel {
+    transform: none !important;
+    perspective: none !important;
+}
+
+/* Simplify shadows */
+body[data-performance="low"] * {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Disable filters on low-end */
+body[data-performance="low"] .fas,
+body[data-performance="low"] .far,
+body[data-performance="low"] i {
+    filter: none !important;
+}
+
+/* ==========================================
+   INSTANT INTERACTIONS
+   ========================================== */
+
+/* Make clicks feel instant */
+button:active,
+.btn:active,
+.nav-item:active {
+    transition-duration: 0.05s !important;
+}
+
+/* Faster input focus */
+input:focus,
+textarea:focus,
+select:focus {
+    transition-duration: 0.15s !important;
+}
+
+/* ==========================================
+   PERFORMANCE HINTS
+   ========================================== */
+
+/* Use GPU acceleration only where needed */
+.glass-panel,
+.card,
+.btn,
+.nav-item {
+    will-change: auto !important;
+}
+
+/* Only animate transform and opacity */
+* {
+    will-change: auto !important;
+}
+
+/* Contain paint for better performance */
+.page {
+    contain: layout style paint;
+}
+
+.glass-panel,
+.card {
+    contain: layout style;
+}

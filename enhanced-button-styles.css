@@ -1,0 +1,601 @@
+/* 🎨 Enhanced Button Design System for MessTrack */
+/* Modern glassmorphism buttons with improved UX and accessibility */
+
+:root {
+    /* Button color palette */
+    --btn-primary: linear-gradient(135deg, rgba(99, 102, 241, 0.4), rgba(139, 92, 246, 0.4));
+    --btn-primary-hover: linear-gradient(135deg, rgba(99, 102, 241, 0.6), rgba(139, 92, 246, 0.6));
+    --btn-success: linear-gradient(135deg, rgba(34, 197, 94, 0.4), rgba(16, 185, 129, 0.4));
+    --btn-success-hover: linear-gradient(135deg, rgba(34, 197, 94, 0.6), rgba(16, 185, 129, 0.6));
+    --btn-danger: linear-gradient(135deg, rgba(239, 68, 68, 0.4), rgba(220, 38, 38, 0.4));
+    --btn-danger-hover: linear-gradient(135deg, rgba(239, 68, 68, 0.6), rgba(220, 38, 38, 0.6));
+    --btn-warning: linear-gradient(135deg, rgba(251, 191, 36, 0.4), rgba(245, 158, 11, 0.4));
+    --btn-warning-hover: linear-gradient(135deg, rgba(251, 191, 36, 0.6), rgba(245, 158, 11, 0.6));
+    --btn-info: linear-gradient(135deg, rgba(59, 130, 246, 0.4), rgba(37, 99, 235, 0.4));
+    --btn-info-hover: linear-gradient(135deg, rgba(59, 130, 246, 0.6), rgba(37, 99, 235, 0.6));
+    
+    /* Button shadows */
+    --btn-shadow: 0 4px 15px rgba(0, 0, 0, 0.1), 
+                  0 1px 3px rgba(0, 0, 0, 0.08),
+                  inset 0 1px 0 rgba(255, 255, 255, 0.15);
+    --btn-shadow-hover: 0 8px 25px rgba(0, 0, 0, 0.15), 
+                        0 4px 10px rgba(0, 0, 0, 0.1),
+                        inset 0 1px 0 rgba(255, 255, 255, 0.25);
+    --btn-shadow-active: 0 2px 8px rgba(0, 0, 0, 0.15),
+                         inset 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* ==========================================
+   BASE BUTTON STYLES
+   ========================================== */
+
+.btn-glass,
+button:not(.nav-item):not([class*="peer"]) {
+    /* Base glass effect */
+    background: linear-gradient(
+        135deg,
+        rgba(255, 255, 255, 0.1) 0%,
+        rgba(255, 255, 255, 0.05) 100%
+    ) !important;
+    backdrop-filter: blur(12px) saturate(180%);
+    -webkit-backdrop-filter: blur(12px) saturate(180%);
+    
+    /* Border and shape */
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: 14px;
+    
+    /* Typography */
+    color: rgba(255, 255, 255, 0.95) !important;
+    font-weight: 600;
+    font-size: 14px;
+    letter-spacing: 0.3px;
+    
+    /* Spacing */
+    padding: 12px 24px;
+    
+    /* Effects */
+    box-shadow: var(--btn-shadow);
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+    
+    /* Transitions */
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    
+    /* Prevent text selection */
+    user-select: none;
+    -webkit-user-select: none;
+    
+    /* Ensure proper stacking */
+    z-index: 1;
+}
+
+/* Shimmer effect overlay */
+.btn-glass::before,
+button:not(.nav-item):not([class*="peer"])::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.2),
+        transparent
+    );
+    transition: left 0.5s ease;
+    z-index: -1;
+}
+
+/* Glow effect on hover */
+.btn-glass::after,
+button:not(.nav-item):not([class*="peer"])::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: radial-gradient(
+        circle,
+        rgba(255, 255, 255, 0.3) 0%,
+        transparent 70%
+    );
+    transform: translate(-50%, -50%);
+    transition: width 0.4s ease, height 0.4s ease;
+    pointer-events: none;
+    z-index: -1;
+}
+
+/* ==========================================
+   BUTTON STATES
+   ========================================== */
+
+/* Hover state */
+.btn-glass:hover,
+button:not(.nav-item):not([class*="peer"]):hover {
+    background: linear-gradient(
+        135deg,
+        rgba(255, 255, 255, 0.15) 0%,
+        rgba(255, 255, 255, 0.08) 100%
+    ) !important;
+    border-color: rgba(255, 255, 255, 0.3);
+    box-shadow: var(--btn-shadow-hover);
+    transform: translateY(-2px) scale(1.02);
+}
+
+.btn-glass:hover::before,
+button:not(.nav-item):not([class*="peer"]):hover::before {
+    left: 100%;
+}
+
+.btn-glass:hover::after,
+button:not(.nav-item):not([class*="peer"]):hover::after {
+    width: 120%;
+    height: 120%;
+}
+
+/* Active/pressed state */
+.btn-glass:active,
+button:not(.nav-item):not([class*="peer"]):active {
+    transform: translateY(0) scale(0.98);
+    box-shadow: var(--btn-shadow-active);
+    transition: all 0.1s ease;
+}
+
+/* Focus state for accessibility */
+.btn-glass:focus,
+button:not(.nav-item):not([class*="peer"]):focus {
+    outline: none;
+    box-shadow: 
+        var(--btn-shadow),
+        0 0 0 3px rgba(99, 102, 241, 0.3);
+}
+
+/* Disabled state */
+.btn-glass:disabled,
+button:not(.nav-item):not([class*="peer"]):disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none !important;
+    pointer-events: none;
+}
+
+/* ==========================================
+   BUTTON VARIANTS
+   ========================================== */
+
+/* Primary button */
+.btn-primary,
+.bg-blue-500.btn-glass,
+.bg-indigo-600.btn-glass {
+    background: var(--btn-primary) !important;
+    border-color: rgba(99, 102, 241, 0.4);
+    box-shadow: 
+        0 4px 15px rgba(99, 102, 241, 0.3),
+        var(--btn-shadow);
+}
+
+.btn-primary:hover,
+.bg-blue-500.btn-glass:hover,
+.bg-indigo-600.btn-glass:hover {
+    background: var(--btn-primary-hover) !important;
+    box-shadow: 
+        0 8px 25px rgba(99, 102, 241, 0.4),
+        var(--btn-shadow-hover);
+}
+
+/* Success button */
+.btn-success,
+.bg-green-500.btn-glass,
+.bg-green-500.bg-opacity-20 {
+    background: var(--btn-success) !important;
+    border-color: rgba(34, 197, 94, 0.4);
+    box-shadow: 
+        0 4px 15px rgba(34, 197, 94, 0.3),
+        var(--btn-shadow);
+}
+
+.btn-success:hover,
+.bg-green-500.btn-glass:hover,
+.bg-green-500.bg-opacity-20:hover {
+    background: var(--btn-success-hover) !important;
+    box-shadow: 
+        0 8px 25px rgba(34, 197, 94, 0.4),
+        var(--btn-shadow-hover);
+}
+
+/* Danger button */
+.btn-danger,
+.bg-red-500.btn-glass,
+.bg-red-500.bg-opacity-20 {
+    background: var(--btn-danger) !important;
+    border-color: rgba(239, 68, 68, 0.4);
+    box-shadow: 
+        0 4px 15px rgba(239, 68, 68, 0.3),
+        var(--btn-shadow);
+}
+
+.btn-danger:hover,
+.bg-red-500.btn-glass:hover,
+.bg-red-500.bg-opacity-20:hover {
+    background: var(--btn-danger-hover) !important;
+    box-shadow: 
+        0 8px 25px rgba(239, 68, 68, 0.4),
+        var(--btn-shadow-hover);
+}
+
+/* Warning button */
+.btn-warning,
+.bg-yellow-500.btn-glass,
+.bg-yellow-500.bg-opacity-20 {
+    background: var(--btn-warning) !important;
+    border-color: rgba(251, 191, 36, 0.4);
+    box-shadow: 
+        0 4px 15px rgba(251, 191, 36, 0.3),
+        var(--btn-shadow);
+}
+
+.btn-warning:hover,
+.bg-yellow-500.btn-glass:hover,
+.bg-yellow-500.bg-opacity-20:hover {
+    background: var(--btn-warning-hover) !important;
+    box-shadow: 
+        0 8px 25px rgba(251, 191, 36, 0.4),
+        var(--btn-shadow-hover);
+}
+
+/* Info button */
+.btn-info,
+.bg-blue-400.btn-glass {
+    background: var(--btn-info) !important;
+    border-color: rgba(59, 130, 246, 0.4);
+    box-shadow: 
+        0 4px 15px rgba(59, 130, 246, 0.3),
+        var(--btn-shadow);
+}
+
+.btn-info:hover,
+.bg-blue-400.btn-glass:hover {
+    background: var(--btn-info-hover) !important;
+    box-shadow: 
+        0 8px 25px rgba(59, 130, 246, 0.4),
+        var(--btn-shadow-hover);
+}
+
+/* ==========================================
+   SPECIAL BUTTON TYPES
+   ========================================== */
+
+/* Attendance buttons (large interactive cards) */
+.attendance-btn {
+    background: linear-gradient(
+        135deg,
+        rgba(255, 255, 255, 0.08) 0%,
+        rgba(255, 255, 255, 0.03) 100%
+    ) !important;
+    backdrop-filter: blur(16px) saturate(180%);
+    -webkit-backdrop-filter: blur(16px) saturate(180%);
+    border: 2px solid rgba(255, 255, 255, 0.15);
+    border-radius: 20px;
+    padding: 32px;
+    transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+}
+
+.attendance-btn::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(
+        circle,
+        rgba(255, 255, 255, 0.1) 0%,
+        transparent 70%
+    );
+    opacity: 0;
+    transition: opacity 0.4s ease;
+}
+
+.attendance-btn:hover {
+    background: linear-gradient(
+        135deg,
+        rgba(255, 255, 255, 0.12) 0%,
+        rgba(255, 255, 255, 0.06) 100%
+    ) !important;
+    border-color: rgba(255, 255, 255, 0.25);
+    transform: translateY(-6px) scale(1.02);
+    box-shadow: 
+        0 20px 40px rgba(0, 0, 0, 0.2),
+        0 8px 16px rgba(0, 0, 0, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.attendance-btn:hover::before {
+    opacity: 1;
+}
+
+.attendance-btn:active {
+    transform: translateY(-2px) scale(0.99);
+}
+
+/* Marked attendance state */
+.attendance-btn.marked {
+    background: linear-gradient(
+        135deg,
+        rgba(34, 197, 94, 0.3) 0%,
+        rgba(16, 185, 129, 0.3) 100%
+    ) !important;
+    border-color: rgba(34, 197, 94, 0.5);
+    box-shadow: 
+        0 12px 30px rgba(34, 197, 94, 0.3),
+        0 4px 12px rgba(0, 0, 0, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.attendance-btn.marked:hover {
+    background: linear-gradient(
+        135deg,
+        rgba(34, 197, 94, 0.4) 0%,
+        rgba(16, 185, 129, 0.4) 100%
+    ) !important;
+    box-shadow: 
+        0 16px 40px rgba(34, 197, 94, 0.4),
+        0 8px 16px rgba(0, 0, 0, 0.15),
+        inset 0 1px 0 rgba(255, 255, 255, 0.25);
+}
+
+/* Icon buttons (small, circular) */
+.btn-icon {
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+}
+
+.btn-icon:hover {
+    transform: translateY(-2px) scale(1.1) rotate(5deg);
+}
+
+.btn-icon:active {
+    transform: translateY(0) scale(1) rotate(0deg);
+}
+
+/* Floating Action Button (FAB) */
+.fab {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: linear-gradient(
+        135deg,
+        rgba(99, 102, 241, 0.5) 0%,
+        rgba(139, 92, 246, 0.5) 100%
+    ) !important;
+    backdrop-filter: blur(16px) saturate(200%);
+    -webkit-backdrop-filter: blur(16px) saturate(200%);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 
+        0 12px 35px rgba(99, 102, 241, 0.4),
+        0 8px 20px rgba(0, 0, 0, 0.2),
+        inset 0 2px 4px rgba(255, 255, 255, 0.3);
+    position: fixed;
+    bottom: 90px;
+    right: 20px;
+    z-index: 999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+.fab::after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background: radial-gradient(
+        circle,
+        rgba(255, 255, 255, 0.3) 0%,
+        transparent 70%
+    );
+    animation: fabPulse 2s ease-in-out infinite;
+}
+
+@keyframes fabPulse {
+    0%, 100% { transform: scale(1); opacity: 0.5; }
+    50% { transform: scale(1.2); opacity: 0.8; }
+}
+
+.fab:hover {
+    transform: scale(1.15) rotate(90deg);
+    box-shadow: 
+        0 16px 45px rgba(99, 102, 241, 0.5),
+        0 12px 25px rgba(0, 0, 0, 0.25),
+        inset 0 2px 4px rgba(255, 255, 255, 0.4);
+}
+
+.fab:active {
+    transform: scale(1.05) rotate(90deg);
+}
+
+/* ==========================================
+   BUTTON GROUPS
+   ========================================== */
+
+.btn-group {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.btn-group .btn-glass {
+    flex: 1;
+    min-width: fit-content;
+}
+
+/* ==========================================
+   RESPONSIVE ADJUSTMENTS
+   ========================================== */
+
+@media (max-width: 768px) {
+    .btn-glass,
+    button:not(.nav-item):not([class*="peer"]) {
+        padding: 10px 20px;
+        font-size: 13px;
+        border-radius: 12px;
+    }
+    
+    .attendance-btn {
+        padding: 24px;
+        border-radius: 16px;
+    }
+    
+    .fab {
+        width: 56px;
+        height: 56px;
+        font-size: 20px;
+        bottom: 80px;
+        right: 16px;
+    }
+    
+    .btn-icon {
+        width: 40px;
+        height: 40px;
+        font-size: 16px;
+    }
+}
+
+@media (max-width: 480px) {
+    .btn-glass,
+    button:not(.nav-item):not([class*="peer"]) {
+        padding: 8px 16px;
+        font-size: 12px;
+    }
+    
+    .btn-group {
+        gap: 6px;
+    }
+}
+
+/* ==========================================
+   PERFORMANCE OPTIMIZATIONS
+   ========================================== */
+
+/* Low performance mode - simplified buttons */
+body[data-performance="low"] .btn-glass,
+body[data-performance="low"] button:not(.nav-item):not([class*="peer"]) {
+    backdrop-filter: blur(6px) !important;
+    -webkit-backdrop-filter: blur(6px) !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+}
+
+body[data-performance="low"] .btn-glass::before,
+body[data-performance="low"] .btn-glass::after,
+body[data-performance="low"] button:not(.nav-item):not([class*="peer"])::before,
+body[data-performance="low"] button:not(.nav-item):not([class*="peer"])::after {
+    display: none !important;
+}
+
+body[data-performance="low"] .btn-glass:hover,
+body[data-performance="low"] button:not(.nav-item):not([class*="peer"]):hover {
+    transform: translateY(-1px) scale(1.01);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+}
+
+body[data-performance="low"] .attendance-btn {
+    backdrop-filter: blur(8px) !important;
+    -webkit-backdrop-filter: blur(8px) !important;
+}
+
+body[data-performance="low"] .attendance-btn::before {
+    display: none !important;
+}
+
+body[data-performance="low"] .fab::after {
+    display: none !important;
+}
+
+/* Medium performance mode - balanced */
+body[data-performance="medium"] .btn-glass,
+body[data-performance="medium"] button:not(.nav-item):not([class*="peer"]) {
+    backdrop-filter: blur(10px) !important;
+    -webkit-backdrop-filter: blur(10px) !important;
+}
+
+body[data-performance="medium"] .attendance-btn {
+    backdrop-filter: blur(12px) !important;
+    -webkit-backdrop-filter: blur(12px) !important;
+}
+
+/* ==========================================
+   ACCESSIBILITY
+   ========================================== */
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+    .btn-glass,
+    button:not(.nav-item):not([class*="peer"]) {
+        border-width: 2px;
+        border-color: rgba(255, 255, 255, 0.5);
+    }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+    .btn-glass,
+    button:not(.nav-item):not([class*="peer"]),
+    .attendance-btn,
+    .fab {
+        transition: none !important;
+        animation: none !important;
+    }
+    
+    .btn-glass::before,
+    .btn-glass::after,
+    button::before,
+    button::after,
+    .attendance-btn::before,
+    .fab::after {
+        animation: none !important;
+        transition: none !important;
+    }
+}
+
+/* Focus visible for keyboard navigation */
+.btn-glass:focus-visible,
+button:not(.nav-item):not([class*="peer"]):focus-visible {
+    outline: 3px solid rgba(99, 102, 241, 0.5);
+    outline-offset: 2px;
+}
+
+/* ==========================================
+   PRINT STYLES
+   ========================================== */
+
+@media print {
+    .btn-glass,
+    button:not(.nav-item):not([class*="peer"]),
+    .attendance-btn,
+    .fab {
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+        background: white !important;
+        color: black !important;
+        border: 1px solid black !important;
+        box-shadow: none !important;
+    }
+}
